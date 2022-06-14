@@ -2,30 +2,24 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-
-const dotenv = require('dotenv');
-dotenv.config();
-const MY_DATABASE_URL = process.env.DATABASE_URL;
-
+const helmet = require('helmet');
+require('dotenv').config();
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
 
-mongoose.connect(MY_DATABASE_URL,
+// Connect to database
+mongoose.connect(process.env.DATABASE_URL,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+  .then(() => console.log('Successfully connected to MongoDB!'))
+  .catch(() => console.log('Failed to connect to MongoDB!'));
 
 const app = express();
 
 app.use(express.json());
 
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-//   next();
-// });
+app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
+
 app.use(cors());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
